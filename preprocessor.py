@@ -101,10 +101,47 @@ class PreProcessor:
 
     def adjust_brightness(self, image, factor, slice):
         #Convert to hue, saturation, value model
-        hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+        rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
         hsv[:,:,slice] = hsv[:,:,slice] * factor
         rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
         return rgb
+
+
+    def optical_flow(im_c, im_n):
+        gray_c = self.grayscale(im_c)
+        gray_n = self.grayscale(im_n)
+        hsv = np.zeros((66, 220, 3))
+        hsv[:,:,1] = cv2.cvtColor(image_next, cv2.COLOR_RGB2HSV)[:,:,1]
+ 
+        flow_mat = None
+        image_scale = 0.5
+        nb_images = 1
+        win_size = 15
+        nb_iterations = 2
+        deg_expansion = 5
+        STD = 1.3
+        extra = 0
+
+        flow = cv2.calcOpticalFlowFarneback(gray_current, gray_next,  
+                                            flow_mat, 
+                                            image_scale, 
+                                            nb_images, 
+                                            win_size, 
+                                            nb_iterations, 
+                                            deg_expansion, 
+                                            STD, 
+                                            0)
+                                            
+            
+        mag, ang = cv2.cartToPolar(flow[..., 0], flow[..., 1])  
+        hsv[:,:,0] = ang * (180/ np.pi / 2)
+        hsv[:,:,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
+        hsv = np.asarray(hsv, dtype= np.float32)
+        rgb_flow = cv2.cvtColor(hsv,cv2.COLOR_HSV2RGB)
+
+        
+        return rgb_flow
 
 
 if __name__ == "__main__":
