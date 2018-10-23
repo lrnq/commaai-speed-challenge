@@ -22,7 +22,7 @@ class PreProcessor:
 
     def grayscale(self, frame):
         """Method for converting frame to grey scale"""
-        return cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        return cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
 
     def plot_training_speed(self, data):
@@ -102,17 +102,21 @@ class PreProcessor:
     def adjust_brightness(self, image, factor, slice):
         #Convert to hue, saturation, value model
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+        hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)
         hsv[:,:,slice] = hsv[:,:,slice] * factor
         rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
         return rgb
 
+    def crop_sky_and_dashboard(self, frame):
+        frame = frame[100:440, :-90]
+        image = cv2.resize(frame, (220, 66), interpolation = cv2.INTER_AREA)
+        return image
 
-    def optical_flow(im_c, im_n):
+    def optical_flow(self, im_c, im_n):
         gray_c = self.grayscale(im_c)
         gray_n = self.grayscale(im_n)
         hsv = np.zeros((66, 220, 3))
-        hsv[:,:,1] = cv2.cvtColor(image_next, cv2.COLOR_RGB2HSV)[:,:,1]
+        hsv[:,:,1] = cv2.cvtColor(im_n, cv2.COLOR_RGB2HSV)[:,:,1]
  
         flow_mat = None
         image_scale = 0.5
@@ -121,9 +125,8 @@ class PreProcessor:
         nb_iterations = 2
         deg_expansion = 5
         STD = 1.3
-        extra = 0
 
-        flow = cv2.calcOpticalFlowFarneback(gray_current, gray_next,  
+        flow = cv2.calcOpticalFlowFarneback(gray_c, gray_n,  
                                             flow_mat, 
                                             image_scale, 
                                             nb_images, 
@@ -140,6 +143,7 @@ class PreProcessor:
         hsv = np.asarray(hsv, dtype= np.float32)
         rgb_flow = cv2.cvtColor(hsv,cv2.COLOR_HSV2RGB)
 
+        cv2.imwrite("./flow.jpg", rgb_flow)
         
         return rgb_flow
 
@@ -148,3 +152,24 @@ if __name__ == "__main__":
     klass = PreProcessor()
    #klass.plot_training_speed(LABELS)
    #klass.generate_images(VIDEO_FILE, LABELS)
+    df = pd.read_csv('./processed.csv', header = None)
+    train, valid = klass.shuffle_frame_pairs(df) 
+    im = cv2.imread(train[0].values[190])
+    im1 = cv2.imread(train[0].values[191])
+    im = klass.adjust_brightness(im, 1.6, 2)
+    im1 = klass.adjust_brightness(im1, 1.6, 2)
+    crop1 = klass.crop_sky_and_dashboard(im)
+    crop2 = klass.crop_sky_and_dashboard(im1)
+    plt.imshow(im)
+    plt.show()
+    plt.imshow(im1)
+    plt.show()
+    plt.imshow(crop1)
+    plt.show()
+    plt.imshow(crop2)
+    plt.show()
+    optical = klass.optical_flow(crop1, crop2)
+    plt.imshow(optical)
+    plt.show()
+    print(train[0].values[191])
+    print(train[0].values[190])
