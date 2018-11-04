@@ -1,10 +1,8 @@
 #!/home/nichlaslr/anaconda3/bin/python
-
-import csv
-import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 VIDEO_FILE = "./data/train1.mp4"
 LABELS = "./data/train.txt"
@@ -115,7 +113,7 @@ class PreProcessor:
     def optical_flow(self, im_c, im_n):
         gray_c = self.grayscale(im_c)
         gray_n = self.grayscale(im_n)
-        hsv = np.zeros((66, 220, 3))
+        hsv = np.zeros_like(im_c)
         hsv[:,:,1] = cv2.cvtColor(im_n, cv2.COLOR_RGB2HSV)[:,:,1]
  
         flow_mat = None
@@ -142,8 +140,7 @@ class PreProcessor:
         hsv[:,:,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
         hsv = np.asarray(hsv, dtype= np.float32)
         rgb_flow = cv2.cvtColor(hsv,cv2.COLOR_HSV2RGB)
-
-        cv2.imwrite("./flow.jpg", rgb_flow)
+        #cv2.imwrite("./flow.jpg", rgb_flow)
         
         return rgb_flow
 
@@ -160,16 +157,16 @@ if __name__ == "__main__":
     im1 = klass.adjust_brightness(im1, 1.6, 2)
     crop1 = klass.crop_sky_and_dashboard(im)
     crop2 = klass.crop_sky_and_dashboard(im1)
-    plt.imshow(im)
-    plt.show()
-    plt.imshow(im1)
-    plt.show()
-    plt.imshow(crop1)
-    plt.show()
-    plt.imshow(crop2)
-    plt.show()
+   # plt.imshow(im)
+   # plt.show()
+   # plt.imshow(im1)
+   # plt.show()
+   # plt.imshow(crop1)
+   # plt.show()
+   # plt.imshow(crop2)
+   # plt.show()
     optical = klass.optical_flow(crop1, crop2)
-    plt.imshow(optical)
+    plt.imshow((optical*255).astype(np.uint8))
     plt.show()
     print(train[0].values[191])
     print(train[0].values[190])
