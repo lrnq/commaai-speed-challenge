@@ -3,13 +3,13 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.utils import shuffle
 import numpy as np
 import pandas as pd
-import model 
+import updated_model 
 
 
 pre = PreProcessor()
 
 
-def generate_training_data(data, batch_size = 32):
+def generate_training_data(data, batch_size = 16):
     image_batch = np.zeros((batch_size, 66, 220, 3)) # nvidia input params
     label_batch = np.zeros((batch_size))
     while True:
@@ -32,14 +32,6 @@ def generate_training_data(data, batch_size = 32):
                 row1 = row_now
                 row2 = row_next
                 
-            else:
-                print('time_now is not next or prev: ', time_now)
-                print('time_prev is :', time_prev)
-                print('time_next is: ', time_next)
-                
-                print('\n diff: now  - prev \t', time_now - time_prev)
-                print('\n diff: next - now: \t', time_next - time_now)
-            
             x1, y1 = pre.preprocess_image_from_path(row1[0].values[0],row1[2].values[0]) 
             x2, y2 = pre.preprocess_image_from_path(row2[0].values[0],row2[2].values[0])
            
@@ -70,14 +62,6 @@ def generate_validation_data(data):
             elif time_next - time_now > 0 and 0.000001 < time_next - time_now < 0.58:
                 row1 = row_now
                 row2 = row_next
-            
-            else:
-                print('time_now is not next or prev: ', time_now)
-                print('time_prev is :', time_prev)
-                print('time_next is: ', time_next)
-                
-                print('\n diff: now  - prev \t', time_now - time_prev)
-                print('\n diff: next - now: \t', time_next - time_now)
 
             x1, y1 = pre.preprocess_image_valid_from_path(row1[0].values[0], row1[2].values[0])
             x2, y2 = pre.preprocess_image_valid_from_path(row2[0].values[0], row2[2].values[0])
@@ -92,7 +76,7 @@ def generate_validation_data(data):
 
 
 if __name__ == "__main__":
-    filepath = 'model-weights-Vtest3.h5'
+    filepath = 'model-weights-Vtest5.h5'
     df = pd.read_csv("./processed.csv", header = None)
     pre = PreProcessor()
     train, test = pre.shuffle_frame_pairs(df)
@@ -100,9 +84,9 @@ if __name__ == "__main__":
     size_train = len(train.index)
     print(size_test)
     print(size_train)
-    dl_model = model.speed_model()
+    dl_model = updated_model.speed_model()
     earlyStopping = EarlyStopping(monitor='val_loss', 
-                              patience=1, 
+                              patience=2, 
                               verbose=1, 
                               min_delta = 0.23,
                               mode='min',)
@@ -117,7 +101,7 @@ if __name__ == "__main__":
     test_generator = generate_validation_data(test)
     history = dl_model.fit_generator(
             train_generator, 
-            steps_per_epoch = 400, 
+            steps_per_epoch = 555,
             epochs = 25,
             callbacks = callbacks_list,
             verbose = 1,
