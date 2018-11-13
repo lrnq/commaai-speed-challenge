@@ -3,7 +3,7 @@ from keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.utils import shuffle
 import numpy as np
 import pandas as pd
-import updated_model 
+import model 
 
 
 pre = PreProcessor()
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     size_train = len(train.index)
     print(size_test)
     print(size_train)
-    dl_model = updated_model.speed_model()
+    dl_model = model.speed_model()
     earlyStopping = EarlyStopping(monitor='val_loss', 
                               patience=2, 
                               verbose=1, 

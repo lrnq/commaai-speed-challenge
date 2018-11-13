@@ -4,7 +4,7 @@ import numpy as np
 from preprocessor import PreProcessor
 import pandas as pd
 import training
-import updated_model
+import model
 
 
 
@@ -45,7 +45,7 @@ def predictions(data, model):
 
 
 if __name__ == "__main__":
-    model = updated_model.speed_model()
+    model = model.speed_model()
     model.load_weights("./model-weights-Vtest5.h5")
 
     print(model.summary())
@@ -55,8 +55,8 @@ if __name__ == "__main__":
     train, test = pre.shuffle_frame_pairs(df)
     test_generator = training.generate_validation_data(test)
 
-    #val_score = model.evaluate_generator(test_generator, steps=len(test))
-    #print(val_score)
+    val_score = model.evaluate_generator(test_generator, steps=len(test))
+    print(val_score)
 
-    data = predictions(test, model)
-    data.to_pickle("./predictions2.pkl")
+    #data = predictions(test, model)
+    #data.to_pickle("./predictions2.pkl")
