@@ -1,4 +1,4 @@
-#!/home/nichlaslr/anaconda3/bin/python
+#!/usr/bin/python
 import csv
 import cv2
 import numpy as np
