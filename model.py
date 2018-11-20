@@ -1,4 +1,4 @@
-#!/home/nichlaslr/anaconda3/bin/python
+#!/usr/bin/python
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.keras.layers import Input, Dense, Activation, Conv2D, ELU, TimeDistributed, Flatten, Dropout, Lambda
 from tensorflow.keras.optimizers import Nadam
