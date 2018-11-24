@@ -1,2 +1,5 @@
 data/
 data_preprocessed/
+__pycache__
+*.pyc
+*.pyo
