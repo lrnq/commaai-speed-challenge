@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from tensorflow.keras.models import load_model
 import pickle
 import numpy as np
@@ -39,24 +40,25 @@ def predictions(data, model):
         prediction = model.predict(img_diff)
         error = abs(prediction-y2)
         new_data.append([prediction[0][0], y2, error[0][0], time_now, time_prev])
-        print(new_data)
     return pd.DataFrame(new_data)
 
+
+def get_pred_mse(preds):
+    df = pd.read_pickle(preds)
+    avg = np.mean(df[2].values**2)
+    return avg
 
 
 if __name__ == "__main__":
     model = model.speed_model()
-    model.load_weights("./model-weights-Vtest5.h5")
-
-    print(model.summary())
+    model.load_weights("./model-weights.h5")
 
     df = pd.read_csv("./processed.csv", header = None)
     pre = PreProcessor()
     train, test = pre.shuffle_frame_pairs(df)
     test_generator = training.generate_validation_data(test)
-
     val_score = model.evaluate_generator(test_generator, steps=len(test))
-    print(val_score)
+    data = predictions(test, model)
+    data.to_pickle("./predictions.pkl")
 
-    #data = predictions(test, model)
-    #data.to_pickle("./predictions2.pkl")
+    print(get_pred_mse("predictions.pkl"))

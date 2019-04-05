@@ -1,14 +1,19 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+import os
 import csv
 import cv2
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-VIDEO_FILE = "./data/train1.mp4"
+VIDEO_FILE = "./data/train.mp4"
 LABELS = "./data/train.txt"
 OUTPUT_PATH = "./data_preprocessed/"
 FRAME_RATE = 20
+
+if not os.path.exists(OUTPUT_PATH):
+    os.mkdir(OUTPUT_PATH)
+    print("Directory " , OUTPUT_PATH,  " Created ")
 
 flow_mat = None
 image_scale = 0.5
@@ -137,7 +142,7 @@ class PreProcessor:
         hsv[:, :, 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
         hsv = np.asarray(hsv, dtype=np.float32)
         rgb_flow = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
-        # cv2.imwrite("./flow.jpg", rgb_flow)
+        #cv2.imwrite("./flow.jpg", rgb_flow)
 
         return rgb_flow
 
@@ -159,26 +164,17 @@ class PreProcessor:
 
 if __name__ == "__main__":
     klass = PreProcessor()
-    # klass.plot_training_speed(LABELS)
-    # klass.generate_images(VIDEO_FILE, LABELS)
-    df = pd.read_csv('./processed.csv', header=None)
-    train, valid = klass.shuffle_frame_pairs(df)
-    im = cv2.imread(train[0].values[190])
-    im1 = cv2.imread(train[0].values[191])
-    im = klass.adjust_brightness(im, 1.6, 2)
-    im1 = klass.adjust_brightness(im1, 1.6, 2)
-    crop1 = klass.crop_sky_and_dashboard(im)
-    crop2 = klass.crop_sky_and_dashboard(im1)
-    # plt.show()
-    # plt.imshow(im1)
-    # plt.show()
-    # plt.imshow(crop1)
-    # plt.imshow(im)
-    # plt.show()
-    # plt.imshow(crop2)
-    # plt.show()
-    optical = klass.optical_flow(crop1, crop2)
-    plt.imshow((optical * 255).astype(np.uint8))
-    plt.show()
-    print(train[0].values[191])
-    print(train[0].values[190])
+    klass.plot_training_speed(LABELS)
+    klass.generate_images(VIDEO_FILE, LABELS)
+   # df = pd.read_csv('./processed.csv', header=None)
+   # train, valid = klass.shuffle_frame_pairs(df)
+   # im = cv2.imread(train[0].values[190])
+   # im1 = cv2.imread(train[0].values[191])
+   # im = klass.adjust_brightness(im, 1.6, 2)
+   # im1 = klass.adjust_brightness(im1, 1.6, 2)
+   # crop1 = klass.crop_sky_and_dashboard(im)
+   # crop2 = klass.crop_sky_and_dashboard(im1)
+   # optical = klass.optical_flow(crop1, crop2)
+   # plt.imshow((optical * 255).astype(np.uint8))
+   # plt.show()
+   # print("Preprocessor")

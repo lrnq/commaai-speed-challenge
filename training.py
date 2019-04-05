@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from preprocessor import PreProcessor
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.utils import shuffle
@@ -76,14 +77,14 @@ def generate_validation_data(data):
 
 
 if __name__ == "__main__":
-    filepath = 'model-weights-Vtest5.h5'
+    filepath = 'model-weights.h5'
     df = pd.read_csv("./processed.csv", header = None)
     pre = PreProcessor()
     train, test = pre.shuffle_frame_pairs(df)
     size_test = len(test.index)
     size_train = len(train.index)
-    print(size_test)
-    print(size_train)
+    #print(size_test)
+    #print(size_train)
     dl_model = model.speed_model()
     earlyStopping = EarlyStopping(monitor='val_loss', 
                               patience=2, 
